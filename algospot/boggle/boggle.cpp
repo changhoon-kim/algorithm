@@ -1,13 +1,15 @@
 #include <cstdio>
 #include <vector>
+#include <cstring>
 #include <string>
 using namespace std;
-int32_t directionRow[] = {1, 1,  0, -1, -1, -1, 0, 1};
-int32_t directionCol[] = {0, -1, -1, -1, 0, 1, 1, 1};
-bool isExistWord(vector<string>& board, string& word, int32_t row, int32_t col, int32_t index);
-bool outOfBoard(int32_t row, int32_t col);
+int directionRow[] = {1, 1,  0, -1, -1, -1, 0, 1};
+int directionCol[] = {0, -1, -1, -1, 0, 1, 1, 1};
+bool isExistWord(vector<string>& board, string& word, int row, int col, int index);
+bool inBoard(int row, int col);
+int cache[10][5][5];
 int main() {
-    int32_t nCase = 0;
+    int nCase = 0;
 
     scanf("%d", &nCase);
 
@@ -22,7 +24,7 @@ int main() {
         }
 
         // input known words
-        int32_t nWord = 0;
+        int nWord = 0;
         scanf("%d", &nWord);
         vector<string> words(nWord);
         for(int i = 0; i < nWord; i++) {
@@ -40,18 +42,19 @@ int main() {
         // 5. return 결과에 따라 'YES' or 'NO' 출력
         // 6. 알고 있는 단어에 대해 1~5 과정을 반복
         for(int i = 0; i < nWord; i++) {
+            memset(cache, -1, sizeof(cache));
             if(isExistWord(board, words[i], -1, -1, 0)) {
-                printf("YES\n");
+                printf("%s YES\n", words[i].c_str());
             } else {
-                printf("NO\n");
+                printf("%s NO\n", words[i].c_str());
             }
         }
     }
 
     return 0;
 }
-bool isExistWord(vector<string>& board, string& word, int32_t row, int32_t col, int32_t index) {
-    if(index >= word.size()) return true;
+bool isExistWord(vector<string>& board, string& word, int row, int col, int index) {
+    if(index >= (int)word.size()) return true;
 
     if(row == -1) {
         for(int i = 0; i < 5; i++) {
@@ -66,20 +69,21 @@ bool isExistWord(vector<string>& board, string& word, int32_t row, int32_t col, 
         return false;
     }
 
+    int& result = cache[index][row][col];
+    if(result != -1) return result;
+    result = 0;
     for(int i = 0; i < 8; i++) {
-        int32_t nextRow = row + directionRow[i];
-        int32_t nextCol = col + directionCol[i];
-        if(outOfBoard(nextRow, nextCol)) continue;
-        if(board[nextRow][nextCol] == word[index]) {
-            if(isExistWord(board, word, nextRow, nextCol, index + 1))
-                return true;
+        int nextRow = row + directionRow[i];
+        int nextCol = col + directionCol[i];
+        if(inBoard(nextRow, nextCol) && board[nextRow][nextCol] == word[index]) {
+            result = result | isExistWord(board, word, nextRow, nextCol, index + 1);
         }
     }
 
-    return false;
+    return result;
 }
-bool outOfBoard(int32_t row, int32_t col) {
-    if(row < 0 || col < 0) return true;
-    if(row > 4 || col > 4) return true;
-    return false;
+bool inBoard(int row, int col) {
+    if(row < 0 || col < 0) return false;
+    if(row > 4 || col > 4) return false;
+    return true;
 }
