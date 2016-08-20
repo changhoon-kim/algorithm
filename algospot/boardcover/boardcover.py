@@ -2,11 +2,18 @@ block = [[[1,0], [0,1]], [[1,0], [1,-1]], [[1,0], [1,1]], [[1,1], [0,1]]]
 EMPTY_POINT = 0
 NOT_EMPTY_POINT = 1
 
+def in_board(row, col):
+    if row < 0 or row >= height:
+        return False
+    if col < 0 or col >= width:
+        return False
+    return True
+
 def can_put(row, col, index):
     for i in range(0, 2):
         check_row = row + block[index][i][0]
         check_col = col + block[index][i][1]
-        if check_row >= height or check_col >= width:
+        if not in_board(check_row, check_col):
             return False
         if board[check_row][check_col] != EMPTY_POINT: # '.'
             return False
@@ -36,7 +43,7 @@ def count_cover(row, col):
         return count_cover(row, col + 1)
 
     result = 0
-    for i in range(len(block)):
+    for i in range(0, 4):
         if can_put(row, col, i):
             put(row, col, i)
             result = result + count_cover(row, col + 1)
@@ -55,7 +62,7 @@ if __name__ == "__main__":
         board = []
         for i in range(0, height):
             line = []
-            for char in raw_input():
+            for char in raw_input().strip():
                 if char == '.':
                     line.append(EMPTY_POINT)
                 else:
