@@ -1,5 +1,5 @@
 CC		= gcc
-CPPC		= g++
+CPPC		= g++ -std=c++11
 CFLAGS		= -O2 -W -Wall
 C_FILES		= $(wildcard *.c)
 C_OBJECTS	= $(foreach obj, $(C_FILES:.c=.o), c_$(obj))
